@@ -3,26 +3,26 @@
 
 void Init(JNIEnv *env, jobject thiz, jobject ctx, jobject title, jobject subtitle) {
     //Set sub title
-    setText(env, title, OBFUSCATE("<b>Modded by (yourname)</b>"));
+    setText(env, title, OBFUSCATE("<b>Modded by FrostyDev</b>"));
 
     //Set sub title
     setText(env, subtitle, OBFUSCATE("<b><marquee><p style=\"font-size:30\">"
-                                     "<p style=\"color:green;\">Modded by LGL</p> | "
-                                     "https://github.com/LGLTeam | Lorem Ipsum is simply dummy text of the printing and typesetting</p>"
+                                     "<p style=\"color:green;\">Modded By FrostyDev</p> | "
+                                     "https://github.com/Gledi01 | Sultengrat7 - FrostyDev - Modder</p>"
                                      "</marquee></b>"));
 
     //Dialog Example
     Dialog(env,
            ctx,
-           OBFUSCATE("Welcome to your mod menu"),
+           OBFUSCATE("Selamat Datang Di Mod Menu Dupe"),
            OBFUSCATE("Thanks for the installation and call to action"),
            OBFUSCATE("Visit"), // set nullptr if btn-link is not needed
            OBFUSCATE("Close"),
            3, // set 0 if auto-close is not needed
-           OBFUSCATE("https://github.com/LGLTeam")); // set nullptr if btn-link is not needed
+           OBFUSCATE("https://frosty-dev-home.vercel.app")); // set nullptr if btn-link is not needed
 
     //Toast Example
-    Toast(env, ctx, OBFUSCATE("Modded by YOU"), ToastLength::LENGTH_LONG);
+    Toast(env, ctx, OBFUSCATE("Modded by FrosyDev"), ToastLength::LENGTH_LONG);
 }
 
 jstring Icon(JNIEnv *env, jobject thiz) {
