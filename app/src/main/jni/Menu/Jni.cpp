@@ -84,26 +84,33 @@ int get_api_sdk(JNIEnv* env) {
 
 void startActivityPermisson(JNIEnv *env, jobject ctx){
     jclass native_context = env->GetObjectClass(ctx);
-    jmethodID startActivity = env->GetMethodID(native_context, OBFUSCATE("startActivity"),OBFUSCATE("(Landroid/content/Intent;)V"));
-
-    jmethodID pack = env->GetMethodID(native_context, OBFUSCATE("getPackageName"),OBFUSCATE("()Ljava/lang/String;"));
-    jstring packageName = static_cast<jstring>(env->CallObjectMethod(ctx, pack));
-
+    jmethodID startActivity = env->GetMethodID(native_context, "startActivity", "(Landroid/content/Intent;)V");
+    
+    // Ambil package name
+    jmethodID getPackageName = env->GetMethodID(native_context, "getPackageName", "()Ljava/lang/String;");
+    jstring packageName = (jstring)env->CallObjectMethod(ctx, getPackageName);
     const char *pkg = env->GetStringUTFChars(packageName, 0);
-
-    std::stringstream strpkg;
-    strpkg << OBFUSCATE("package:");
-    strpkg << pkg;
-    std::string pakg = strpkg.str();
-
-    jclass Uri = env->FindClass(OBFUSCATE("android/net/Uri"));
-    jmethodID Parce = env->GetStaticMethodID(Uri, OBFUSCATE("parse"), OBFUSCATE("(Ljava/lang/String;)Landroid/net/Uri;"));
-    jobject UriMethod = env->CallStaticObjectMethod(Uri, Parce, env->NewStringUTF(pakg.c_str()));
-
-    jclass intentclass = env->FindClass(OBFUSCATE("android/content/Intent"));
-    jmethodID newIntent = env->GetMethodID(intentclass, OBFUSCATE("<init>"), OBFUSCATE("(Ljava/lang/String;Landroid/net/Uri;)V"));
-    jobject intent = env->NewObject(intentclass,newIntent,env->NewStringUTF(OBFUSCATE("android.settings.action.MANAGE_OVERLAY_PERMISSION")), UriMethod);
-
+    
+    // Bikin URI: package:com.yourapp.mod
+    std::string uriStr = "package:";
+    uriStr += pkg;
+    env->ReleaseStringUTFChars(packageName, pkg);
+    
+    jclass uriClass = env->FindClass("android/net/Uri");
+    jmethodID parse = env->GetStaticMethodID(uriClass, "parse", "(Ljava/lang/String;)Landroid/net/Uri;");
+    jobject uri = env->CallStaticObjectMethod(uriClass, parse, env->NewStringUTF(uriStr.c_str()));
+    
+    // Intent langsung ke halaman izin overlay aplikasi ini (bukan daftar semua)
+    jclass intentClass = env->FindClass("android/content/Intent");
+    jmethodID newIntent = env->GetMethodID(intentClass, "<init>", "(Ljava/lang/String;Landroid/net/Uri;)V");
+    jobject intent = env->NewObject(intentClass, newIntent, 
+        env->NewStringUTF("android.settings.action.MANAGE_OVERLAY_PERMISSION"), 
+        uri);
+    
+    // FLAG_ACTIVITY_NEW_TASK biar gak crash
+    jmethodID addFlags = env->GetMethodID(intentClass, "addFlags", "(I)Landroid/content/Intent;");
+    env->CallObjectMethod(intent, addFlags, 0x10000000); // FLAG_ACTIVITY_NEW_TASK
+    
     env->CallVoidMethod(ctx, startActivity, intent);
 }
 
